@@ -20,6 +20,8 @@
 *.mod
 *.smod
 
+.vs/*
+
 # Compiled Static libraries
 *.lai
 *.la
@@ -30,3 +32,13 @@
 *.exe
 *.out
 *.app
+
+Debug/*
+
+*.tlog
+*.lastbuilstate
+*.log
+*.idb
+*.pdb
+
+
